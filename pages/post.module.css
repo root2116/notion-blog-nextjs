@@ -1,9 +1,10 @@
 .container {
   padding: 0 20px;
-  max-width: 700px;
+  max-width: 900px;
   margin: 0 auto;
-  line-height: 1.5;
+  line-height: 2.0;
   white-space: pre-line;
+
 }
 
 .container h1 {
@@ -18,6 +19,11 @@
 .container figure {
   margin-left: 0;
   margin-right: 0;
+}
+
+.container p {
+    font-size: 16px;
+    margin-bottom: 2em;
 }
 
 .container figcaption {
