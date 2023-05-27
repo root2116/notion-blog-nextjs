@@ -4,16 +4,36 @@ import { getDatabase, getPage, getBlocks } from "../lib/notion";
 import Link from "next/link";
 import { databaseId } from "./index.js";
 import styles from "./post.module.css";
+import 'katex/dist/katex.min.css';
+import katex from 'katex';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+
+
+const ogs = require('open-graph-scraper');
 
 export const Text = ({ text }) => {
   if (!text) {
     return null;
   }
+
+  
+
   return text.map((value) => {
     const {
       annotations: { bold, code, color, italic, strikethrough, underline },
       text,
+      type,
+      equation
     } = value;
+    
+    if (type === "equation") {
+      const equationHtml = katex.renderToString(equation.expression, {
+        throwOnError: false,
+      });
+      return <span dangerouslySetInnerHTML={{ __html: equationHtml }} />;
+    }
+
     return (
       <span
         className={[
@@ -45,7 +65,7 @@ const renderNestedList = (block) => {
   return <ul>{value.children.map((block) => renderBlock(block))}</ul>;
 };
 
-const renderBlock = (block) => {
+const renderBlock = (block, embedData=null) => {
   const { type, id } = block;
   const value = block[type];
 
@@ -128,14 +148,15 @@ const renderBlock = (block) => {
     case "divider":
       return <hr key={id} />;
     case "quote":
-      return <blockquote key={id}>{value.rich_text[0].plain_text}</blockquote>;
+      return <blockquote key={id} className={styles.quote}>{value.rich_text[0].plain_text}</blockquote>;
     case "code":
+      const codeString = value.rich_text[0].plain_text;
+      const language = value.language;
+      console.log(language);
       return (
-        <pre className={styles.pre}>
-          <code className={styles.code_block} key={id}>
-            {value.rich_text[0].plain_text}
-          </code>
-        </pre>
+        <SyntaxHighlighter language={language} style={atomDark}>
+          {codeString}
+        </SyntaxHighlighter>
       );
     case "file":
       const src_file =
@@ -154,13 +175,34 @@ const renderBlock = (block) => {
           {caption_file && <figcaption>{caption_file}</figcaption>}
         </figure>
       );
-    case "bookmark":
+    case "bookmark": {
       const href = value.url;
-      return (
-        <a href={href} target="_brank" className={styles.bookmark}>
-          {href}
-        </a>
-      );
+      const embedInfo = embedData.find(data => data.blockId === id);
+      console.log(embedInfo);
+      if (embedInfo) {
+        const { ogTitle: title, ogDescription: description, ogImage } = embedInfo.data;
+        const image = ogImage.length > 0 ? ogImage[0].url : null;
+        return (
+            <a href={href} target="_blank" rel="noopener noreferrer">
+              <div className={styles.embedContainer}>
+                
+                <img className={styles.embedImage} src={image} alt={title} />
+                
+                <div className={styles.embedContent}>
+                  <div className={styles.embedTitle}>{title}</div>
+                  <div className={styles.embedDescription}>{description}</div>
+                </div>
+              </div>
+            </a>
+        );
+      } else {
+        return (
+          <a href={href} target="_blank" rel="noopener noreferrer">
+            {href}
+          </a>
+        );
+      }
+    }
     case "table": {
       return (
         <table className={styles.table}>
@@ -187,12 +229,30 @@ const renderBlock = (block) => {
     case "column_list": {
       return (
         <div className={styles.row}>
-          {block.children.map((block) => renderBlock(block))}
+              {block.children && block.children.map((block) => renderBlock(block))}
         </div>
       );
     }
     case "column": {
       return <div>{block.children.map((child) => renderBlock(child))}</div>;
+    }
+    case 'equation': {
+        const equationHtml = katex.renderToString(value.expression, {
+            throwOnError: false,
+        });
+        return (
+            <div dangerouslySetInnerHTML={{ __html: equationHtml }} />
+        );
+    }
+    case 'callout': {
+      return (
+        <div className={styles.callout}>
+          {value.icon && <span className={styles.calloutIcon}>{value.icon.emoji}</span>}
+          <div>
+            <Text text={value.rich_text} />
+          </div>
+        </div>
+      );
     }
     default:
       return `❌ Unsupported block (${
@@ -201,7 +261,7 @@ const renderBlock = (block) => {
   }
 };
 
-export default function Post({ page, blocks }) {
+export default function Post({ page, blocks, embedData }) {
   if (!page || !blocks) {
     return <div />;
   }
@@ -218,7 +278,7 @@ export default function Post({ page, blocks }) {
         </h1>
         <section>
           {blocks.map((block) => (
-            <Fragment key={block.id}>{renderBlock(block)}</Fragment>
+            <Fragment key={block.id}>{renderBlock(block, embedData)}</Fragment>
           ))}
           <Link href="/" className={styles.back}>
             ← Go home
@@ -242,10 +302,23 @@ export const getStaticProps = async (context) => {
   const page = await getPage(id);
   const blocks = await getBlocks(id);
 
+  const bookmarks = blocks.filter(block => block.type === 'bookmark');
+
+  const embedPromises = bookmarks.map(async (block) => {
+    const { url } = block.bookmark;
+    const { result } = await ogs({ url });
+    return {
+      blockId: block.id,
+      data: result,
+    };
+  });
+
+  const embedData = await Promise.all(embedPromises);
   return {
     props: {
       page,
       blocks,
+      embedData,
     },
     revalidate: 1,
   };

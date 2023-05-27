@@ -6,6 +6,7 @@ import styles from "./index.module.css";
 
 export const databaseId = process.env.NOTION_DATABASE_ID;
 
+
 export default function Home({ posts }) {
   return (
     <div>
@@ -64,7 +65,7 @@ export default function Home({ posts }) {
 
 export const getStaticProps = async () => {
   const database = await getDatabase(databaseId);
-
+  
   const publishedPosts = database.filter(post => post.properties.Published.checkbox === true);
   return {
     props: {
