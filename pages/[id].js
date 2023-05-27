@@ -150,9 +150,9 @@ const renderBlock = (block, embedData=null) => {
     case "quote":
       return <blockquote key={id} className={styles.quote}>{value.rich_text[0].plain_text}</blockquote>;
     case "code":
-      const codeString = value.rich_text[0].plain_text;
+      const codeBlock = value.rich_text[0];
+      const codeString = codeBlock.plain_text || "";
       const language = value.language;
-      console.log(language);
       return (
         <SyntaxHighlighter language={language} style={atomDark}>
           {codeString}
@@ -178,7 +178,6 @@ const renderBlock = (block, embedData=null) => {
     case "bookmark": {
       const href = value.url;
       const embedInfo = embedData.find(data => data.blockId === id);
-      console.log(embedInfo);
       if (embedInfo) {
         const { ogTitle: title, ogDescription: description, ogImage } = embedInfo.data;
         const image = ogImage.length > 0 ? ogImage[0].url : null;
