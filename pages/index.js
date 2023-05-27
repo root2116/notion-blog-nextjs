@@ -67,6 +67,15 @@ export const getStaticProps = async () => {
   const database = await getDatabase(databaseId);
   
   const publishedPosts = database.filter(post => post.properties.Published.checkbox === true);
+
+  publishedPosts.sort((a, b) => {
+    const dateA = new Date(a.properties['Pub Date'].date.start);
+    const dateB = new Date(b.properties['Pub Date'].date.start);
+
+    // For descending order, switch 'dateA' and 'dateB'
+    return dateB - dateA;
+  });
+
   return {
     props: {
         posts: publishedPosts,
