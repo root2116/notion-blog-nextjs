@@ -4,7 +4,12 @@ import { getDatabase } from "../lib/notion";
 import { Text } from "./[id].js";
 import styles from "./index.module.css";
 
+
+import { downloadAndSaveImage } from '../lib/imageUtils';
+import { publicFolder } from '../lib/imageUtils';
+import path from 'path';
 export const databaseId = process.env.NOTION_DATABASE_ID;
+import fs from 'fs';
 
 
 export default function Home({ posts }) {
@@ -64,17 +69,33 @@ export default function Home({ posts }) {
 }
 
 export const getStaticProps = async () => {
-  const database = await getDatabase(databaseId);
+    const database = await getDatabase(databaseId);
   
-  const publishedPosts = database.filter(post => post.properties.Published.checkbox === true);
+    const publishedPosts = database.filter(post => post.properties.Published.checkbox === true);
 
-  publishedPosts.sort((a, b) => {
-    const dateA = new Date(a.properties['Pub Date'].date.start);
-    const dateB = new Date(b.properties['Pub Date'].date.start);
+    publishedPosts.sort((a, b) => {
+        const dateA = new Date(a.properties['Pub Date'].date.start);
+        const dateB = new Date(b.properties['Pub Date'].date.start);
 
-    // For descending order, switch 'dateA' and 'dateB'
-    return dateB - dateA;
-  });
+        // For descending order, switch 'dateA' and 'dateB'
+        return dateB - dateA;
+    });
+
+    for (const post of publishedPosts) {
+        const thumbnailUrl = post.properties.Thumbnail.files[0]?.file?.url
+        if (thumbnailUrl) {
+            const imageName = `${post.id}.png`
+            const imgPath = path.join(publicFolder, imageName)
+
+            if (!fs.existsSync(imgPath)) {
+                await downloadAndSaveImage(thumbnailUrl, imgPath)
+            }
+
+            // Replace the thumbnail URL
+            post.properties.Thumbnail.files[0].file.url = `/${imageName}`
+        }
+    }
+
 
   return {
     props: {

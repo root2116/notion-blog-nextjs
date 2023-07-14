@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^2.2.3",
+    "axios": "^1.4.0",
     "katex": "^0.16.7",
     "next": "13.1.6",
     "open-graph-scraper": "^5.2.3",

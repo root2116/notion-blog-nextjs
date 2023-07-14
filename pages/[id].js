@@ -9,6 +9,10 @@ import katex from 'katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
+import { downloadAndSaveImage } from '../lib/imageUtils';
+import { publicFolder } from '../lib/imageUtils';
+import path from 'path';
+import fs from 'fs';
 
 const ogs = require('open-graph-scraper');
 
@@ -302,7 +306,7 @@ export const getStaticProps = async (context) => {
   const blocks = await getBlocks(id);
 
   const bookmarks = blocks.filter(block => block.type === 'bookmark');
-
+  
   const embedPromises = bookmarks.map(async (block) => {
     const { url } = block.bookmark;
     const { result } = await ogs({ url });
@@ -311,6 +315,21 @@ export const getStaticProps = async (context) => {
       data: result,
     };
   });
+
+    for (const block of blocks) {
+        if (block.type === 'image') {
+            const imgUrl = block.image.file.url
+            const imageName = `${block.id}.png`
+            const imgPath = path.join(publicFolder, imageName)
+            console.log(imgPath);
+            if (!fs.existsSync(imgPath)) {
+                await downloadAndSaveImage(imgUrl, imgPath)
+            }
+
+            // Replace the image URL
+            block.image.file.url = `/${imageName}`
+        }
+    }
 
   const embedData = await Promise.all(embedPromises);
   return {
