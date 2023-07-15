@@ -11,6 +11,7 @@ import path from 'path';
 export const databaseId = process.env.NOTION_DATABASE_ID;
 import fs from 'fs';
 
+import { Analytics } from '@vercel/analytics/react';
 
 export default function Home({ posts }) {
   return (
@@ -63,6 +64,7 @@ export default function Home({ posts }) {
             );
           })}
         </ol>
+        <Analytics />
       </main>
     </div>
   );
