@@ -7,6 +7,19 @@
 
 }
 
+.container h2 {
+    padding: 0.5rem 1rem;
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
+}
+
+.container h3 {
+    border-bottom: 1px solid #A3A3A3;
+    padding: 0.2em 1em;
+    border-left: solid 5px #000000;
+}
+
+
 .container h1 {
   font-size: 32px;
 }
@@ -208,6 +221,17 @@
   }
   .quote {
     border-left: 4px solid rgb(232, 232, 232);
+  }
+
+  .container h2 {
+      border-top: 3px solid rgb(232, 232, 232);
+      border-bottom: 3px solid rgb(232, 232, 232);
+  }
+
+  .container h3 {
+    border-bottom: 1px solid rgb(232, 232, 232);
+    padding: 0.2em 1em;
+    border-left: solid 5px rgb(232, 232, 232);
   }
 }
 
