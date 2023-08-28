@@ -268,11 +268,17 @@ export default function Post({ page, blocks, embedData }) {
   if (!page || !blocks) {
     return <div />;
   }
+  console.log(page);
   return (
     <div>
       <Head>
         <title>{page.properties.Name.title[0].plain_text}</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@ref3rdper" /> 
+        <meta name="twitter:title" content={page.properties.Name.title[0].plain_text} />
+        <meta name="twitter:description" content="" />
+        <meta name="twitter:image" content={page.properties.Thumbnail.files[0].file.url} />
       </Head>
 
       <article className={styles.container}>
@@ -304,6 +310,9 @@ export const getStaticProps = async (context) => {
   const { id } = context.params;
   const page = await getPage(id);
   const blocks = await getBlocks(id);
+  
+  console.log(page);
+//  const thumbnailUrl = page.thumbnailUrl;
 
   const bookmarks = blocks.filter(block => block.type === 'bookmark');
   
