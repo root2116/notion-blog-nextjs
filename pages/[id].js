@@ -320,7 +320,7 @@ export const getStaticProps = async (context) => {
         }
 
         // Replace the thumbnail URL
-        page.properties.Thumbnail.files[0].file.url = imgPath;
+      page.properties.Thumbnail.files[0].file.url = `${process.env.BASEURL}/${imageName}`;
   }
 
   const bookmarks = blocks.filter(block => block.type === 'bookmark');
