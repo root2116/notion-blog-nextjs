@@ -278,6 +278,7 @@ export default function Post({ page, blocks, embedData }) {
         <meta name="twitter:title" content={page.properties.Name.title[0].plain_text} />
         <meta name="twitter:description" content="" />
         <meta name="twitter:image" content={page.properties.Thumbnail.files[0]?.file?.url || '' } />
+        <meta property="og:image" content={page.properties.Thumbnail.files[0]?.file?.url || ''} />
       </Head>
 
       <article className={styles.container}>
