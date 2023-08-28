@@ -309,7 +309,19 @@ export const getStaticProps = async (context) => {
   const { id } = context.params;
   const page = await getPage(id);
   const blocks = await getBlocks(id);
-  
+
+  const thumbnailUrl = page.properties.Thumbnail.files[0]?.file?.url
+  if (thumbnailUrl) {
+        const imageName = `${page.id}.png`
+        const imgPath = path.join(publicFolder, imageName)
+
+        if (!fs.existsSync(imgPath)) {
+            await downloadAndSaveImage(thumbnailUrl, imgPath)
+        }
+
+        // Replace the thumbnail URL
+        page.properties.Thumbnail.files[0].file.url = `/${imageName}`
+  }
 
   const bookmarks = blocks.filter(block => block.type === 'bookmark');
   
