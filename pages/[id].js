@@ -273,7 +273,7 @@ export default function Post({ page, blocks, embedData }) {
       <Head>
         <title>{page.properties.Name.title[0].plain_text}</title>
         <link rel="icon" href="/favicon.ico" />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="summary" />
         <meta name="twitter:site" content="@ref3rdper" /> 
         <meta name="twitter:title" content={page.properties.Name.title[0].plain_text} />
         <meta name="twitter:description" content="" />
