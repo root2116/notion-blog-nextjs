@@ -268,7 +268,6 @@ export default function Post({ page, blocks, embedData }) {
   if (!page || !blocks) {
     return <div />;
   }
-  console.log(page);
   return (
     <div>
       <Head>
