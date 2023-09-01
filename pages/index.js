@@ -13,6 +13,8 @@ import fs from 'fs';
 
 import { Analytics } from '@vercel/analytics/react';
 
+const sharp = require('sharp');
+
 export default function Home({ posts }) {
   return (
     <div>
@@ -91,6 +93,17 @@ export const getStaticProps = async () => {
 
             if (!fs.existsSync(imgPath)) {
                 await downloadAndSaveImage(thumbnailUrl, imgPath)
+            }
+
+            const imageInfo = await sharp(imgPath).metadata();
+
+            if (imageInfo.width > 1000) {
+                const tempPath = `${imgPath}_temp`;
+                await sharp(imgPath)
+                    .resize(1000) // it will maintain the aspect ratio
+                    .toFile(tempPath);
+
+                fs.renameSync(tempPath, imgPath);
             }
 
             // Replace the thumbnail URL

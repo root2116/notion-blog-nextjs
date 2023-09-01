@@ -13,6 +13,7 @@ import { downloadAndSaveImage } from '../lib/imageUtils';
 import { publicFolder } from '../lib/imageUtils';
 import path from 'path';
 import fs from 'fs';
+const sharp = require('sharp');
 
 const ogs = require('open-graph-scraper');
 
@@ -340,13 +341,25 @@ export const getStaticProps = async (context) => {
             const imgUrl = block.image.file.url
             const imageName = `${block.id}.png`
             const imgPath = path.join(publicFolder, imageName)
-            console.log(imgPath);
+            
             if (!fs.existsSync(imgPath)) {
                 await downloadAndSaveImage(imgUrl, imgPath)
             }
 
+            const imageInfo = await sharp(imgPath).metadata();
+
+            if (imageInfo.width > 1000) {
+                const tempPath = `${imgPath}_temp`;
+                await sharp(imgPath)
+                    .resize(1000) // it will maintain the aspect ratio
+                    .toFile(imgPath);
+
+                fs.renameSync(tempPath, imgPath);
+            }
+
             // Replace the image URL
             block.image.file.url = `/${imageName}`
+
         }
     }
 
