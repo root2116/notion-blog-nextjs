@@ -352,7 +352,7 @@ export const getStaticProps = async (context) => {
                 const tempPath = `${imgPath}_temp`;
                 await sharp(imgPath)
                     .resize(1000) // it will maintain the aspect ratio
-                    .toFile(imgPath);
+                    .toFile(tempPath);
 
                 fs.renameSync(tempPath, imgPath);
             }
