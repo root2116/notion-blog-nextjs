@@ -186,7 +186,6 @@ const renderBlock = (block, embedData=null) => {
       if (embedInfo) {
         const { ogTitle: title, ogDescription: description, ogImage } = embedInfo.data;
         const image = ogImage ? ogImage.url : null;
-        console.log(embedInfo.data);
         return (
             <a href={href} target="_blank" rel="noopener noreferrer">
               <div className={styles.embedContainer}>
