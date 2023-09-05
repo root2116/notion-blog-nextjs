@@ -166,9 +166,10 @@
 
 
 .embedContainer {
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 10px;
+    color: rgb(255, 255, 255);
     overflow: hidden;
+    background-color: #283848;
     height: 100px;
     display: flex;
     margin: 5px 0;
@@ -192,14 +193,13 @@
 
 .embedTitle {
     margin: 0;
-    font-size: 0.9em;
+    font-size: 1em;
     font-weight: bold;
 }
 
 .embedDescription {
     margin: 0;
     font-size: 0.8em;
-    overflow: hidden;
     text-overflow: ellipsis;
 }
 
