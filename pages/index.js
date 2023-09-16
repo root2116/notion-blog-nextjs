@@ -21,6 +21,7 @@ export default function Home({ posts }) {
       <Head>
         <title>Just an Asile</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta name="google-site-verification" content="HWTwhxqsAS9EC-qSIaTDzPb-d7KVxXlq62miNRe2wCo" />
       </Head>
 
       <main className={styles.container}>
