@@ -1,4 +1,4 @@
-import { getDatabase } from "../../lib/notion";
+import { getDatabase } from "../lib/notion";
 
 const databaseId = process.env.NOTION_DATABASE_ID;
 
