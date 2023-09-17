@@ -1,39 +1,18 @@
-import { getDatabase } from "../lib/notion";
+import fetch from "isomorphic-unfetch";
 
-const databaseId = process.env.NOTION_DATABASE_ID;
+const Sitemap = () => { };
 
-export default async (req, res) => {
-    try {
-        const database = await getDatabase(databaseId);
-        const publishedPosts = database.filter(
-            (post) => post.properties.Published.checkbox === true
-        );
+export const getServerSideProps = async ({ res }) => {
+    const response = await fetch("https://just-an-asile.vercel.app/api/generate-sitemap");
+    const text = await response.text();
 
-        res.setHeader("Content-Type", "text/xml");
-        res.write(createSitemap(publishedPosts));
-        res.end();
-    } catch (e) {
-        res.statusCode = 500;
-        res.end();
-    }
+    res.setHeader("Content-Type", "text/xml");
+    res.write(text);
+    res.end();
+
+    return {
+        props: {},
+    };
 };
 
-const createSitemap = (posts) => {
-    return `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${posts
-            .map((post) => {
-                const { id } = post;
-                return `
-                <url>
-                    <loc>${`https://just-an-asile.vercel.app/${id}`}</loc>
-                    <lastmod>${new Date(
-                    post.last_edited_time
-                ).toISOString()}</lastmod>
-                </url>
-            `;
-            })
-            .join("")}
-    </urlset>
-  `;
-};
+export default Sitemap;
