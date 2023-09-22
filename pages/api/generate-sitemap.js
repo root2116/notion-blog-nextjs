@@ -26,7 +26,7 @@ const createSitemap = (posts) => {
                 const { id } = post;
                 return `
                 <url>
-                    <loc>${`https://just-an-asile.vercel.app/${id}`}</loc>
+                    <loc>${`https://just-an-asile.com/${id}`}</loc>
                     <lastmod>${new Date(
                     post.last_edited_time
                 ).toISOString()}</lastmod>
