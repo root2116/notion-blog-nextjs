@@ -13,9 +13,11 @@ import { downloadAndSaveImage } from '../lib/imageUtils';
 import { publicFolder } from '../lib/imageUtils';
 import path from 'path';
 import fs from 'fs';
-const sharp = require('sharp');
+
 
 const ogs = require('open-graph-scraper');
+const Jimp = require('jimp');
+
 
 export const Text = ({ text }) => {
   if (!text) {
@@ -348,17 +350,17 @@ export const getStaticProps = async (context) => {
                 await downloadAndSaveImage(imgUrl, imgPath)
             }
 
-            const imageInfo = await sharp(imgPath).metadata();
-
-            if (imageInfo.width > 1000) {
-                const tempPath = `${imgPath}_temp`;
-                await sharp(imgPath)
-                    .resize(1000) // it will maintain the aspect ratio
-                    .toFile(tempPath);
-
-                fs.renameSync(tempPath, imgPath);
+            
+            try {
+                const image = await Jimp.read(imgPath);
+                if (image.bitmap.width > 1000) {
+                    image.resize(1000, Jimp.AUTO) // resize
+                        .quality(60) // set JPEG quality
+                        .writeAsync(imgPath); // save with writeAsync to use await
+                }
+            } catch (err) {
+                console.error('Error reading image with Jimp:', err);
             }
-
             // Replace the image URL
             block.image.file.url = `/${imageName}`
 
@@ -372,5 +374,6 @@ export const getStaticProps = async (context) => {
       blocks,
       embedData,
     },
+    revalidate: 60
   };
 };

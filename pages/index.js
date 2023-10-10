@@ -12,8 +12,7 @@ export const databaseId = process.env.NOTION_DATABASE_ID;
 import fs from 'fs';
 
 import { Analytics } from '@vercel/analytics/react';
-
-const sharp = require('sharp');
+const Jimp = require('jimp');
 
 export default function Home({ posts }) {
   return (
@@ -97,15 +96,15 @@ export const getStaticProps = async () => {
                 await downloadAndSaveImage(thumbnailUrl, imgPath)
             }
 
-            const imageInfo = await sharp(imgPath).metadata();
-
-            if (imageInfo.width > 1000) {
-                const tempPath = `${imgPath}_temp`;
-                await sharp(imgPath)
-                    .resize(1000) // it will maintain the aspect ratio
-                    .toFile(tempPath);
-
-                fs.renameSync(tempPath, imgPath);
+            try {
+                const image = await Jimp.read(imgPath);
+                if (image.bitmap.width > 1000) {
+                    image.resize(1000, Jimp.AUTO) // resize
+                        .quality(60) // set JPEG quality
+                        .writeAsync(imgPath); // save with writeAsync to use await
+                }
+            } catch (err) {
+                console.error('Error reading image with Jimp:', err);
             }
 
             // Replace the thumbnail URL
@@ -117,6 +116,7 @@ export const getStaticProps = async () => {
   return {
     props: {
         posts: publishedPosts,
-    }
+    },
+    revalidate: 60
   };
 };
