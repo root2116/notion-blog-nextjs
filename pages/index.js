@@ -96,16 +96,7 @@ export const getStaticProps = async () => {
                 await downloadAndSaveImage(thumbnailUrl, imgPath)
             }
 
-            try {
-                const image = await Jimp.read(imgPath);
-                if (image.bitmap.width > 1000) {
-                    image.resize(1000, Jimp.AUTO) // resize
-                        .quality(60) // set JPEG quality
-                        .writeAsync(imgPath); // save with writeAsync to use await
-                }
-            } catch (err) {
-                console.error('Error reading image with Jimp:', err);
-            }
+            
 
             // Replace the thumbnail URL
             post.properties.Thumbnail.files[0].file.url = `/${imageName}`

@@ -351,16 +351,7 @@ export const getStaticProps = async (context) => {
             }
 
             
-            try {
-                const image = await Jimp.read(imgPath);
-                if (image.bitmap.width > 1000) {
-                    image.resize(1000, Jimp.AUTO) // resize
-                        .quality(60) // set JPEG quality
-                        .writeAsync(imgPath); // save with writeAsync to use await
-                }
-            } catch (err) {
-                console.error('Error reading image with Jimp:', err);
-            }
+            
             // Replace the image URL
             block.image.file.url = `/${imageName}`
 
