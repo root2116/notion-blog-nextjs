@@ -309,7 +309,7 @@ export const getStaticPaths = async () => {
   };
 };
 
-export const getServerSideProps = async (context) => {
+export const getStaticProps = async (context) => {
   const { id } = context.params;
   const page = await getPage(id);
   const blocks = await getBlocks(id);
@@ -371,6 +371,7 @@ export const getServerSideProps = async (context) => {
       page,
       blocks,
       embedData,
-    }
+    },
+    revalidate: ,
   };
 };
