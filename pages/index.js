@@ -74,7 +74,7 @@ export default function Home({ posts }) {
   );
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
     const database = await getDatabase(databaseId);
   
     const publishedPosts = database.filter(post => post.properties.Published.checkbox === true);
@@ -117,7 +117,6 @@ export const getStaticProps = async () => {
   return {
     props: {
         posts: publishedPosts,
-    },
-    revalidate: 60,
+    }
   };
 };
