@@ -372,6 +372,6 @@ export const getStaticProps = async (context) => {
       blocks,
       embedData,
     },
-    revalidate: ,
+    revalidate: 1,
   };
 };
