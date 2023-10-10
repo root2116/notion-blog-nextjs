@@ -14,7 +14,7 @@ const handler = async (req, res) => {
         await res.revalidate(`/${id}`)
         return res.json({ revalidated: true })
     } catch (err) {
-        return res.status(500).send('Error revalidating')
+        return res.status(500).send('Error revalidating, id: ' + id + ', err: ' + err + '')
     }
 }
 
