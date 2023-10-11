@@ -5,15 +5,12 @@ import { Text } from "./[id].js";
 import styles from "./index.module.css";
 
 
-import { downloadAndSaveImage } from '../lib/imageUtils';
-import { publicFolder } from '../lib/imageUtils';
-import path from 'path';
+import { downloadAndResizeImage } from '../lib/imageUtils';
 export const databaseId = process.env.NOTION_DATABASE_ID;
-import fs from 'fs';
-
+import { uploadToS3 } from '../lib/awsUtils';
 import { Analytics } from '@vercel/analytics/react';
-const Jimp = require('jimp');
 
+const bucketName = 'just-an-asile'
 export default function Home({ posts }) {
   return (
     <div>
@@ -90,16 +87,15 @@ export const getStaticProps = async () => {
         const thumbnailUrl = post.properties.Thumbnail.files[0]?.file?.url
         if (thumbnailUrl) {
             const imageName = `${post.id}.png`
-            const imgPath = path.join(publicFolder, imageName)
-
-            if (!fs.existsSync(imgPath)) {
-                await downloadAndSaveImage(thumbnailUrl, imgPath)
-            }
 
             
+            
+            
+            const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
+            const imageUrl = await uploadToS3(buffer, imageName, bucketName)
 
             // Replace the thumbnail URL
-            post.properties.Thumbnail.files[0].file.url = `/${imageName}`
+            post.properties.Thumbnail.files[0].file.url = imageUrl
         }
     }
 

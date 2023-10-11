@@ -10,6 +10,7 @@
   "dependencies": {
     "@notionhq/client": "^2.2.13",
     "@vercel/analytics": "^1.0.1",
+    "aws-sdk": "^2.1472.0",
     "axios": "^1.4.0",
     "jimp": "^0.22.10",
     "katex": "^0.16.7",

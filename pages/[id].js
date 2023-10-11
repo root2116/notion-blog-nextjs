@@ -9,15 +9,18 @@ import katex from 'katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
-import { downloadAndSaveImage } from '../lib/imageUtils';
-import { publicFolder } from '../lib/imageUtils';
+import { downloadAndResizeImage } from '../lib/imageUtils';
 import path from 'path';
-import fs from 'fs';
 
+import { uploadToS3 } from '../lib/awsUtils';
 
 const ogs = require('open-graph-scraper');
 const Jimp = require('jimp');
 
+
+
+
+const bucketName = 'just-an-asile';
 
 export const Text = ({ text }) => {
   if (!text) {
@@ -318,15 +321,15 @@ export const getStaticProps = async (context) => {
 
   const thumbnailUrl = page.properties.Thumbnail.files[0]?.file?.url
   if (thumbnailUrl) {
-        const imageName = `${page.id}.png`
-        const imgPath = path.join(publicFolder, imageName)
+    const imageName = `${page.id}.png`
 
-        if (!fs.existsSync(imgPath)) {
-            await downloadAndSaveImage(thumbnailUrl, imgPath)
-        }
+    const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
+    const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+    
+        
 
-        // Replace the thumbnail URL
-      page.properties.Thumbnail.files[0].file.url = `${process.env.BASEURL}/${imageName}`;
+    // Replace the thumbnail URL
+    page.properties.Thumbnail.files[0].file.url = imageUrl;
   }
 
   const bookmarks = blocks.filter(block => block.type === 'bookmark');
@@ -344,16 +347,13 @@ export const getStaticProps = async (context) => {
         if (block.type === 'image') {
             const imgUrl = block.image.file.url
             const imageName = `${block.id}.png`
-            const imgPath = path.join(publicFolder, imageName)
             
-            if (!fs.existsSync(imgPath)) {
-                await downloadAndSaveImage(imgUrl, imgPath)
-            }
 
-            
-            
+            const buffer = await downloadAndResizeImage(imgUrl, 1000)
+            const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+
             // Replace the image URL
-            block.image.file.url = `/${imageName}`
+            block.image.file.url = imageUrl;
 
         }
     }
