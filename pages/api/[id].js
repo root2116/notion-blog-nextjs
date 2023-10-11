@@ -4,7 +4,7 @@ const handler = async (req, res) => {
     const secret = req.query.secret ?? req.body.secret
 
     const id = req.query.id
-    if (secret !== "hogehoge") {
+    if (secret !== process.env.REVALIDATION_TOKEN ) {
         return res.status(401).json({ message: 'Invalid token' })
     }
 
