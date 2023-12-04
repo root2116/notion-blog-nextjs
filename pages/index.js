@@ -7,7 +7,7 @@ import styles from "./index.module.css";
 
 import { downloadAndResizeImage } from '../lib/imageUtils';
 export const databaseId = process.env.NOTION_DATABASE_ID;
-import { uploadToS3 } from '../lib/awsUtils';
+import { uploadToS3, checkFileExistsInS3 } from '../lib/awsUtils';
 import { Analytics } from '@vercel/analytics/react';
 
 const bucketName = 'just-an-asile'
@@ -90,12 +90,18 @@ export const getStaticProps = async () => {
 
             
             
-            
-            const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
-            const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+            const doesExist = await checkFileExistsInS3(bucketName, imageName)
+            if(!doesExist){
+              const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
+              const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+               // Replace the thumbnail URL
+              
+            }
 
-            // Replace the thumbnail URL
-            post.properties.Thumbnail.files[0].file.url = imageUrl
+          post.properties.Thumbnail.files[0].file.url =  `https://${bucketName}.s3.ap-northeast-1.amazonaws.com/${imageName}`;
+            
+
+           
         }
     }
 
