@@ -90,13 +90,12 @@ export const getStaticProps = async () => {
 
             
             
-            const doesExist = await checkFileExistsInS3(bucketName, imageName)
-            if(!doesExist){
-              const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
-              const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+            
+          const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
+          uploadToS3(buffer, imageName, bucketName)
                // Replace the thumbnail URL
               
-            }
+            
 
           post.properties.Thumbnail.files[0].file.url =  `https://${bucketName}.s3.ap-northeast-1.amazonaws.com/${imageName}`;
             
