@@ -12,7 +12,7 @@ import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { downloadAndResizeImage } from '../lib/imageUtils';
 import path from 'path';
 
-import { uploadToS3 } from '../lib/awsUtils';
+import { uploadToS3, checkFileExistsInS3 } from '../lib/awsUtils';
 
 const ogs = require('open-graph-scraper');
 const Jimp = require('jimp');
@@ -348,9 +348,12 @@ export const getStaticProps = async (context) => {
             const imgUrl = block.image.file.url
             const imageName = `${block.id}.png`
             
-
-            const buffer = await downloadAndResizeImage(imgUrl, 1000)
-            const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+            const doesExist = await checkFileExistsInS3(imageName, bucketName)
+            if(!doesExist){
+              const buffer = await downloadAndResizeImage(imgUrl, 1000)
+              const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+            }
+            
 
             // Replace the image URL
             block.image.file.url = imageUrl;
