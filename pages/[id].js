@@ -356,7 +356,8 @@ export const getStaticProps = async (context) => {
             
 
             // Replace the image URL
-            block.image.file.url = imageUrl;
+            block.image.file.url =  `https://${bucketName}.s3.ap-northeast-1.amazonaws.com/${imageName}`;
+            
 
         }
     }
