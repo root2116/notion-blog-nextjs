@@ -348,11 +348,10 @@ export const getStaticProps = async (context) => {
             const imgUrl = block.image.file.url
             const imageName = `${block.id}.png`
             
-            const doesExist = await checkFileExistsInS3(imageName, bucketName)
-            if(!doesExist){
-              const buffer = await downloadAndResizeImage(imgUrl, 1000)
-              const imageUrl = await uploadToS3(buffer, imageName, bucketName)
-            }
+            
+            const buffer = await downloadAndResizeImage(imgUrl, 1000)
+            uploadToS3(buffer, imageName, bucketName)
+            
             
 
             // Replace the image URL
