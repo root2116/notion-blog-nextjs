@@ -91,8 +91,8 @@ export const getStaticProps = async () => {
             
             
             
-          const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
-          await uploadToS3(buffer, imageName, bucketName)
+        //   const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
+        //   await uploadToS3(buffer, imageName, bucketName)
                // Replace the thumbnail URL
               
             

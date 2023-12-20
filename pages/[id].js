@@ -349,8 +349,8 @@ export const getStaticProps = async (context) => {
             const imageName = `${block.id}.png`
             
             
-            const buffer = await downloadAndResizeImage(imgUrl, 1000)
-            await uploadToS3(buffer, imageName, bucketName)
+            // const buffer = await downloadAndResizeImage(imgUrl, 1000)
+            // await uploadToS3(buffer, imageName, bucketName)
             
             
 
