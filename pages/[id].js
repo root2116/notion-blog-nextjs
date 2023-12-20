@@ -323,13 +323,13 @@ export const getStaticProps = async (context) => {
   if (thumbnailUrl) {
     const imageName = `${page.id}.png`
 
-    const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
-    const imageUrl = await uploadToS3(buffer, imageName, bucketName)
+    // const buffer = await downloadAndResizeImage(thumbnailUrl, 1000)
+    // const imageUrl = await uploadToS3(buffer, imageName, bucketName)
     
         
 
     // Replace the thumbnail URL
-    page.properties.Thumbnail.files[0].file.url = imageUrl;
+      page.properties.Thumbnail.files[0].file.url = `https://${bucketName}.s3.ap-northeast-1.amazonaws.com/${imageName}`;
   }
 
   const bookmarks = blocks.filter(block => block.type === 'bookmark');
