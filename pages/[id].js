@@ -350,7 +350,7 @@ export const getStaticProps = async (context) => {
             
             
             const buffer = await downloadAndResizeImage(imgUrl, 1000)
-            uploadToS3(buffer, imageName, bucketName)
+            await uploadToS3(buffer, imageName, bucketName)
             
             
 
