@@ -35,7 +35,7 @@ export default function Home({ posts }) {
         <h2 className={styles.heading}>All Posts</h2>
         <ol className={styles.posts}>
           {posts.map((post) => {
-            const date = new Date(post.properties['Pub Date']).toLocaleString(
+            const date = new Date(post.properties['Pub Date'].date.start).toLocaleString(
                 "ja-JP",
               {
                 timeZone: "Asia/Tokyo",
