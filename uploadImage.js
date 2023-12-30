@@ -3,6 +3,9 @@ const AWS = require("aws-sdk");
 const Jimp = require('jimp');
 require('dotenv').config({ path: '.env.local' });
 
+
+const daysToGoBack = process.argv[2] ? parseInt(process.argv[2]) : 7;
+
 const bucketName = 'just-an-asile'
 const axios = require('axios');
 // Notion APIクライアントの初期化
@@ -121,13 +124,25 @@ async function getNotionBlocks(pageId) {
 }
 
 
-async function uploadImagesFromNotionToS3(databaseId, s3BucketName) {
+async function uploadImagesFromNotionToS3(databaseId, s3BucketName, days) {
     try {
         // データベースからすべてのページを取得
         const pages = await getPagesFromDatabase(databaseId);
 
+        // 現在の日付から指定された日数分遡った日付を取得
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+        
         for (const page of pages) {
             
+            const pagePubDate = new Date(page.properties['Pub Date'].date.start);
+            
+            
+            if (pagePubDate < cutoffDate) {
+                console.log('Skipping page:', pagePubDate);
+                continue; // 指定された日数より前のページはスキップ
+            }
+
             const blocks = await getNotionBlocks(page.id);
 
             // 画像ブロックのみをフィルタリング
@@ -165,4 +180,4 @@ async function uploadImagesFromNotionToS3(databaseId, s3BucketName) {
 }
 
 // この関数を呼び出してNotionのページから画像をアップロード
-uploadImagesFromNotionToS3(process.env.NOTION_DATABASE_ID, bucketName);
+uploadImagesFromNotionToS3(process.env.NOTION_DATABASE_ID, bucketName, daysToGoBack);
