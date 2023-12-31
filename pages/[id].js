@@ -8,7 +8,8 @@ import 'katex/dist/katex.min.css';
 import katex from 'katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
-
+import TwitterEmbed from '../components/TwitterEmbed';
+import TableOfContents from '../components/TableOfContents';
 import { downloadAndResizeImage } from '../lib/imageUtils';
 import path from 'path';
 
@@ -21,6 +22,21 @@ const Jimp = require('jimp');
 
 
 const bucketName = 'just-an-asile';
+
+const generateTableOfContents = (blocks) => {
+    const headers = blocks.filter(block =>
+        block.type === 'heading_1' ||
+        block.type === 'heading_2' ||
+        block.type === 'heading_3'
+    );
+
+    return headers.map(header => ({
+        id: header.id,
+        text: header[header.type].rich_text[0].plain_text,
+        type: header.type
+    }));
+};
+
 
 export const Text = ({ text }) => {
   if (!text) {
@@ -75,7 +91,7 @@ const renderNestedList = (block) => {
   return <ul>{value.children.map((block) => renderBlock(block))}</ul>;
 };
 
-const renderBlock = (block, embedData=null) => {
+const renderBlock = (block, embedData=null, tableOfContents=null) => {
   const { type, id } = block;
   const value = block[type];
 
@@ -88,19 +104,19 @@ const renderBlock = (block, embedData=null) => {
       );
     case "heading_1":
       return (
-        <h1>
+        <h1 id={id}>
           <Text text={value.rich_text} />
         </h1>
       );
     case "heading_2":
       return (
-        <h2>
+        <h2 id={id}>
           <Text text={value.rich_text} />
         </h2>
       );
     case "heading_3":
       return (
-        <h3>
+        <h3 id={id}>
           <Text text={value.rich_text} />
         </h3>
       );
@@ -263,6 +279,15 @@ const renderBlock = (block, embedData=null) => {
         </div>
       );
     }
+    case 'embed': {
+        // if the url is a twitter url, render the twitter embed
+        if (value.url.includes('x.com') || value.url.includes('twitter.com')) {
+            return <TwitterEmbed tweetId={value.url.split('/').pop()} />;
+        }
+    }
+    case 'table_of_contents' :{
+        return <TableOfContents headers={tableOfContents} />
+    }
     default:
       return `❌ Unsupported block (${
         type === "unsupported" ? "unsupported by Notion API" : type
@@ -274,6 +299,7 @@ export default function Post({ page, blocks, embedData }) {
   if (!page || !blocks) {
     return <div />;
   }
+  const tableOfContents = generateTableOfContents(blocks);
   return (
     <div>
       <Head>
@@ -286,16 +312,16 @@ export default function Post({ page, blocks, embedData }) {
         <meta name="twitter:description" content="" />
         <meta name="twitter:image" content={page.properties.Thumbnail.files[0]?.file?.url || '' } />
         <meta property="og:image" content={page.properties.Thumbnail.files[0]?.file?.url || ''} />
-        
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       </Head>
-
+      
       <article className={styles.container}>
         <h1 className={styles.name}>
           <Text text={page.properties.Name.title} />
         </h1>
         <section>
           {blocks.map((block) => (
-            <Fragment key={block.id}>{renderBlock(block, embedData)}</Fragment>
+            <Fragment key={block.id}>{renderBlock(block, embedData, tableOfContents)}</Fragment>
           ))}
           <Link href="/" className={styles.back}>
             ← Go home

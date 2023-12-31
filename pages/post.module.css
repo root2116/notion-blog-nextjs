@@ -203,6 +203,18 @@
     text-overflow: ellipsis;
 }
 
+.heading1 {
+    margin-left: 0;
+}
+
+.heading2 {
+    margin-left: 20px;
+}
+
+.heading3 {
+    margin-left: 40px;
+}
+
 @media (prefers-color-scheme: dark) {
   .code,
   .table,
@@ -234,6 +246,7 @@
     border-left: solid 5px rgb(232, 232, 232);
   }
 }
+
 
 
 @media (max-width: 600px) {
